@@ -1,0 +1,15 @@
+/* ChapterSelector.css */
+
+.react-select__control {
+    font-size: 16px;
+}
+  
+.react-select__option {    
+    font-size: 14px;
+}
+  
+.react-select__menu {
+    text-align: left; /* Ensure options are left-aligned */
+}
+  
+

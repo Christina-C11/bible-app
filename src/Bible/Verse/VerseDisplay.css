@@ -1,0 +1,9 @@
+.verse-content {
+    font-family: 'Times New Roman', '楷体', serif;
+    text-align: left; /* Ensures left alignment */
+  }
+  
+.verse-pair {
+    margin-bottom: 10px;
+    text-align: left; /* Ensures left alignment */
+}
