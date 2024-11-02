@@ -17,11 +17,57 @@ const loadCSV = (filePath) => {
   });
 };
 
+// Serve all Bible data (books, chapters, verses) for a selected version
+app.get('/api/preload/:version', async (req, res) => {
+  const { version } = req.params;
+  
+  try {
+    const books = await loadCSV(path.join(__dirname, 'data', 'Books.csv'));
+
+    const versionFileMap = {
+      'CN': 'Bible_CN.csv',
+      'NKJV': 'Bible_NKJV.csv',
+      'KJV': 'Bible_KJV.csv'
+    };
+
+    if (!versionFileMap[version]) {
+      return res.status(400).send('Invalid version');
+    }
+
+    const versesData = await loadCSV(path.join(__dirname, 'data', versionFileMap[version]));
+
+    const response = books.map(book => {
+      const chapters = versesData
+        .filter(verse => verse.Book === book['Index'])
+        .map(verse => ({
+          chapter: parseInt(verse.Chapter, 10),
+          verse: parseInt(verse.Verse, 10),
+          text: verse.Scripture
+        }));
+      return {
+        book: {...book},
+        chapters: chapters.reduce((acc, curr) => {
+          const chapterIndex = curr.chapter;
+          if (!acc[chapterIndex]) acc[chapterIndex] = [];
+          acc[chapterIndex].push(curr);
+          return acc;
+        }, {})
+      };
+    });
+
+    res.json(response);
+  } catch (err) {
+    console.error("Error preloading data:", err);
+    res.status(500).send('Error preloading data');
+  }
+});
+
 // Serve Books data
 app.get('/api/books', async (req, res) => {
   try {
     const books = await loadCSV(path.join(__dirname, 'data', 'Books.csv'));
-    res.json(books);
+    res.json(books)
+
   } catch (err) {
     console.error("Error loading books data:", err);
     res.status(500).send('Error loading books data');
@@ -58,7 +104,7 @@ app.get('/api/chapters', async (req, res) => {
 });
 
 // Utility function to remove tags
-const removeTags = (text) => text.replace(/<[^>]*>/g, '');
+const removeTags = (text) => text ? text.replace(/<[^>]*>/g, '') : '';
 
 // Serve Bible data for a selected book and chapter (all versions)
 app.get('/api/verses', async (req, res) => {

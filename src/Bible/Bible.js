@@ -9,32 +9,40 @@ import VerseDisplay from './Verse/VerseDisplay';
 
 function Bible() {
   const [books, setBooks] = useState([]);
+  const [preloadedData, setPreloadedData] = useState({});
   const [chapters, setChapters] = useState([]);
   const [verses, setVerses] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState('chinese');
-  const [selectedBookIndex, setSelectedBookIndex] = useState('');
-  const [selectedChapter, setSelectedChapter] = useState('');
+  const [selectedBookIndex, setSelectedBookIndex] = useState('0');
+  const [selectedChapter, setSelectedChapter] = useState('1');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedVersions, setSelectedVersions] = useState({
     CN: true,
-    NKJV: false,
+    NKJV: true,
     KJV: false,
   });
 
+  // Preload data for the selected Bible version
   useEffect(() => {
-    setLoading(true);
-    fetch('/api/books')
-      .then(response => response.json())
-      .then(data => {
-        setBooks(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError("Failed to load books.");
-        setLoading(false);
-      });
-  }, []);
+    const selectedVersion = Object.keys(selectedVersions).find(v => selectedVersions[v]);
+    if (selectedVersion) {
+      setLoading(true);
+      fetch(`/api/preload/${selectedVersion}`)
+        .then(response => response.json())
+        .then(data => {
+          setPreloadedData(data);
+          setBooks(data.map(d => d.book)); // Assuming each entry has a `book` field
+          setLoading(false);
+        })
+        .catch(error => {
+          setError("Failed to preload Bible data.");
+          console.error("Error preloading Bible data:", error);
+          setLoading(false);
+        });
+    }
+  }, [selectedVersions]);
+
 
   useEffect(() => {
     if (selectedBookIndex !== '') {
@@ -77,23 +85,15 @@ function Bible() {
     setSelectedLanguage(event.target.value);
     setSelectedBookIndex('');
     setSelectedChapter('');
-    setVerses([]);
-    setChapters([]);
-    setError('');
   }, []);
 
   const handleBookSelection = useCallback((bookIndex) => {
     setSelectedBookIndex(bookIndex);
     setSelectedChapter('');
-    setVerses([]);
-    setChapters([]);
-    setError('');
   }, []);
 
   const handleChapterSelection = useCallback((event) => {
     setSelectedChapter(Number(event.target.value));
-    setVerses([]);
-    setError('');
   }, []);
 
   const handleVersionChange = useCallback((event) => {
@@ -102,6 +102,12 @@ function Bible() {
       [event.target.name]: event.target.checked,
     }));
   }, []);
+
+  // Extract verses from the preloaded data
+  const getVersesForBookAndChapter = (bookIndex, chapter) => {
+    if (!preloadedData[bookIndex]) return [];
+    return preloadedData[bookIndex].chapters[chapter] || [];
+  };
 
   return (
     <div className="mx-5 my-4">
@@ -158,7 +164,7 @@ function Bible() {
           />
 
           <ChapterSelector 
-            chapters={chapters}
+            chapters={Object.keys(preloadedData[selectedBookIndex]?.chapters || [])}
             selectedChapter={selectedChapter}
             handleChapterSelection={handleChapterSelection}
           />
