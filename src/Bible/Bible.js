@@ -22,13 +22,14 @@ function Bible() {
     NKJV: true,
     KJV: false,
   });
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
   // Preload data for the selected Bible version
   useEffect(() => {
     const selectedVersion = Object.keys(selectedVersions).find(v => selectedVersions[v]);
     if (selectedVersion) {
       setLoading(true);
-      fetch(`/api/preload/${selectedVersion}`)
+      fetch(`{API_BASE_URL}/api/preload/${selectedVersion}`)
         .then(response => response.json())
         .then(data => {
           setPreloadedData(data);
@@ -47,7 +48,7 @@ function Bible() {
   useEffect(() => {
     if (selectedBookIndex !== '') {
       setLoading(true);
-      fetch(`/api/chapters?bookIndex=${selectedBookIndex}`)
+      fetch(`{API_BASE_URL}/api/chapters?bookIndex=${selectedBookIndex}`)
         .then(response => response.json())
         .then(data => {
           setChapters(data.map(Number));
@@ -66,7 +67,7 @@ function Bible() {
   useEffect(() => {
     if (selectedChapter) {
       setLoading(true);
-      fetch(`/api/verses?bookIndex=${selectedBookIndex}&chapter=${selectedChapter}`)
+      fetch(`{API_BASE_URL}/api/verses?bookIndex=${selectedBookIndex}&chapter=${selectedChapter}`)
         .then(response => response.json())
         .then(data => {
           setVerses(data);
