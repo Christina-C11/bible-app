@@ -29,7 +29,7 @@ function Bible() {
     const selectedVersion = Object.keys(selectedVersions).find(v => selectedVersions[v]);
     if (selectedVersion) {
       setLoading(true);
-      fetch(`{API_BASE_URL}/api/preload/${selectedVersion}`)
+      fetch(`${API_BASE_URL}/api/preload/${selectedVersion}`)
         .then(response => response.json())
         .then(data => {
           setPreloadedData(data);
@@ -48,7 +48,7 @@ function Bible() {
   useEffect(() => {
     if (selectedBookIndex !== '') {
       setLoading(true);
-      fetch(`{API_BASE_URL}/api/chapters?bookIndex=${selectedBookIndex}`)
+      fetch(`${API_BASE_URL}/api/chapters?bookIndex=${selectedBookIndex}`)
         .then(response => response.json())
         .then(data => {
           setChapters(data.map(Number));
@@ -67,7 +67,7 @@ function Bible() {
   useEffect(() => {
     if (selectedChapter) {
       setLoading(true);
-      fetch(`{API_BASE_URL}/api/verses?bookIndex=${selectedBookIndex}&chapter=${selectedChapter}`)
+      fetch(`${API_BASE_URL}/api/verses?bookIndex=${selectedBookIndex}&chapter=${selectedChapter}`)
         .then(response => response.json())
         .then(data => {
           setVerses(data);
