@@ -2,7 +2,7 @@
   "name": "bible-app",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://bibleapp-5az4.onrender.com",
+  "proxy": "https://bible-app-backend.vercel.app",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
