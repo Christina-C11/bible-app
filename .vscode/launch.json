@@ -4,11 +4,10 @@
     // Configuration for Node.js (Backend)
     {
       "type": "node",
-      "request": "attach",
+      "request": "launch",
       "name": "Debug Backend (Node.js)",
       "skipFiles": ["<node_internals>/**"],
-      "port": 9229,  // Same as --inspect default port
-      "restart": true
+      "program": "${workspaceFolder}/backend/Server.js"
     },
     // Configuration for React (Frontend)
     {

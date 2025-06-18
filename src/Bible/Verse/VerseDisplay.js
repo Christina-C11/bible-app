@@ -1,21 +1,23 @@
 import React from 'react';
 
-function VerseDisplay({ verses, selectedVersions, books, selectedBookIndex }) {
+function VerseDisplay({ verseObj }) {
   return (
     <div>
-      {verses.length === 0 ? (
+      {verseObj.verses.length === 0 ? (
         <p>No verses available.</p>
       ) : (
         <div className="verse-content" style={{ textAlign: 'left' }}>
-          {verses.map((verse, index) => (
+          {verseObj.verses.map((verse, index) => (
             <div key={index} className="verse-pair">
-              {selectedVersions.CN && (
-                <div>{`【${books[selectedBookIndex]?.['Chinese Abbreviation']} ${books[selectedBookIndex]?.['English Abbreviation']} ${verse.Chapter}:${verse.Verse}】 ${verse.Scripture_CN}`}</div>
+              {verseObj.selectedVersions.CN && (
+                <div>{`【${verseObj.books[(verse.BookIndex)? verse.BookIndex-1:verseObj.selectedBookIndex]?.['Chinese Abbreviation']} 
+                ${verseObj.books[(verse.BookIndex)? verse.BookIndex-1:verseObj.selectedBookIndex]?.['English Abbreviation']} 
+                ${verse.Chapter}:${verse.Verse}】 ${verse.Scripture_CN}`}</div>
               )}
-              {selectedVersions.NKJV && (
+              {verseObj.selectedVersions.NKJV && (
                 <div>[NKJV] {verse.Scripture_NKJV}</div>
               )}
-              {selectedVersions.KJV && (
+              {verseObj.selectedVersions.KJV && (
                 <div>[KJV] {verse.Scripture_KJV}</div>
               )}
               <br /> {/* Adding a line break after each verse pair */}

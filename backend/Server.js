@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
+const { version } = require('os');
 const app = express();
 const port = 5000;
 
@@ -135,6 +136,67 @@ app.get('/api/verses', async (req, res) => {
     res.status(500).send('Error loading verse data');
   }
 });
+
+// 🔍 Search API: /api/search?q=God
+app.get('/api/search', async (req, res) => {
+  const query = (req.query.q || '').trim().toLowerCase();
+  const selectedVersions = ['CN', 'NKJV', 'KJV'].filter(v => req.query[v] === 'true');
+  const versionFileMap = {
+    CN: 'Bible_CN.csv',
+    NKJV: 'Bible_NKJV.csv',
+    KJV: 'Bible_KJV.csv',
+  };
+
+  try {
+    // Load all versions (for display)
+    const versionData = {};
+    for (const v of ['CN', 'NKJV', 'KJV']) {
+      versionData[v] = await loadCSV(path.join(__dirname, 'data', versionFileMap[v]));
+    }
+
+    const verseMap = new Map();
+    let test = "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.".toLowerCase();
+    let canFound = test.includes(query);
+    // Search only selected versions
+    for (const v of selectedVersions) {
+      versionData[v].forEach(verse => {
+        if ((removeTags(verse.Scripture) || '').toLowerCase().includes(query)) {
+          const key = `${verse.Book}_${verse.Chapter}_${verse.Verse}`;
+          if (!verseMap.has(key)) {
+            verseMap.set(key, {
+              BookIndex: parseInt(verse.Book, 10),
+              Chapter: parseInt(verse.Chapter, 10),
+              Verse: parseInt(verse.Verse, 10),
+              Scripture_CN: '',
+              Scripture_NKJV: '',
+              Scripture_KJV: '',
+            });
+          }
+        }
+      });
+    }
+
+    // Populate all version texts into matched verses
+    for (const [key, record] of verseMap.entries()) {
+      const [book, chapter, verse] = key.split('_');
+      for (const v of ['CN', 'NKJV', 'KJV']) {
+        const match = versionData[v].find(
+          item => item.Book === book && item.Chapter === chapter && item.Verse === verse
+        );
+        if (match) {
+          record[`Scripture_${v}`] = removeTags(match.Scripture);
+        }
+      }
+    }
+
+    const results = Array.from(verseMap.values());
+    res.json({ totalResult: results.length, results });
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
