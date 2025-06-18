@@ -139,7 +139,7 @@ app.get('/api/verses', async (req, res) => {
 
 // 🔍 Search API: /api/search?q=God
 app.get('/api/search', async (req, res) => {
-  const query = (req.query.q || '').trim().toLowerCase();
+  const query = (req.query.q || '').trim().toLowerCase().split(/\s+/);
   const selectedVersions = ['CN', 'NKJV', 'KJV'].filter(v => req.query[v] === 'true');
   const versionFileMap = {
     CN: 'Bible_CN.csv',
@@ -155,12 +155,13 @@ app.get('/api/search', async (req, res) => {
     }
 
     const verseMap = new Map();
-    let test = "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.".toLowerCase();
-    let canFound = test.includes(query);
+   
     // Search only selected versions
     for (const v of selectedVersions) {
       versionData[v].forEach(verse => {
-        if ((removeTags(verse.Scripture) || '').toLowerCase().includes(query)) {
+        const text = removeTags(verse.Scripture || '').toLowerCase();
+        const isFound = query.every(word => text.includes(word));
+        if (isFound) {
           const key = `${verse.Book}_${verse.Chapter}_${verse.Verse}`;
           if (!verseMap.has(key)) {
             verseMap.set(key, {

@@ -212,11 +212,11 @@ function Bible() {
             handleChapterSelection={handleChapterSelection}
           />
 
-          {searchText && !loading && (
+          {(['CN', 'NKJV', 'KJV'].some(v => selectedVersions[v] === true)) && (searchText && !loading && (
             <p className="mt-3 text-info text-start">
               🔍 Found <strong>{verses.length}</strong> verse{verses.length !== 1 ? 's' : ''} matching "<em>{searchText}</em>".
             </p>
-          )}
+          ))}
           
           <VerseDisplay 
             verseObj={verseObj}

@@ -3,7 +3,7 @@ import React from 'react';
 function VerseDisplay({ verseObj }) {
   return (
     <div>
-      {verseObj.verses.length === 0 ? (
+      {(['CN', 'NKJV', 'KJV'].every(v => verseObj.selectedVersions[v] === false)) || verseObj.verses.length === 0 ? (
         <p>No verses available.</p>
       ) : (
         <div className="verse-content" style={{ textAlign: 'left' }}>
