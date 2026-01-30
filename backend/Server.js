@@ -81,7 +81,7 @@ app.get('/api/books', async (req, res) => {
 // Serve Chapter data based on selected book index
 app.get('/api/chapters', async (req, res) => {
   const bookIndex = parseInt(req.query.bookIndex, 10);
-  console.log("Received request for book index:", bookIndex); // Debugging
+  //console.log("Received request for book index:", bookIndex); // Debugging
 
   try {
     const books = await loadCSV(path.join(__dirname, 'data', 'Books.csv'));
@@ -91,7 +91,7 @@ app.get('/api/chapters', async (req, res) => {
     }
 
     const results = await loadCSV(path.join(__dirname, 'data', 'Bible_CN.csv'));
-    console.log(results);
+    //console.log(results);
     const chapters = results
       .filter(data => data.Book === book['Index'])
       .map(data => parseInt(data.Chapter, 10)); // Convert chapters to numbers
@@ -99,7 +99,7 @@ app.get('/api/chapters', async (req, res) => {
     const uniqueChapters = [...new Set(chapters)]; // Ensure unique chapters
     uniqueChapters.sort((a, b) => a - b); // Sort chapters numerically
 
-    console.log("Chapters found:", uniqueChapters); // Debugging
+    //console.log("Chapters found:", uniqueChapters); // Debugging
     res.json(uniqueChapters);
   } catch (err) {
     console.error("Error loading chapters:", err); // Debugging
