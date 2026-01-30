@@ -22,6 +22,14 @@ function Bible() {
     NKJV: true,
     KJV: false,
   });
+
+  const [searchText, setSearchText] = useState('');
+    let verseObj = {
+    verses: verses,
+    selectedVersions: selectedVersions,
+    books: books,
+    selectedBookIndex: selectedBookIndex
+  };
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
   // Preload data for the selected Bible version
@@ -171,12 +179,7 @@ function Bible() {
           />
 
           <VerseDisplay 
-            verses={verses}
-            selectedVersions={selectedVersions}
-            books={books}
-            selectedBookIndex={selectedBookIndex}
-            abbrevClass={selectedLanguage === 'chinese' ? 'chinese-text' : 'english-text'}
-            fullNameClass={selectedLanguage === 'chinese' ? 'chinese-text' : 'english-text'}
+            verseObj={verseObj}
           />
         </div>
       </div>
