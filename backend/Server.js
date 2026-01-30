@@ -201,12 +201,7 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-// For local development only
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
-}
-
-// Export for Vercel serverless
-module.exports = app;
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
