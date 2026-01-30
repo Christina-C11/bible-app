@@ -1,70 +1,97 @@
-# Getting Started with Create React App
+# Multilingual Bible Search Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack bilingual Bible application built with React and Node.js/Express for inserting Bible verses into church documents quickly and efficiently.
 
-## Available Scripts
+![Bible App Screenshot](./screenshot.png)
 
-In the project directory, you can run:
+## Why I Built This
 
-### `npm start`
+**The Problem:**
+I needed a tool to save time when inserting Bible verses into Word documents (.docx) for church sermons. The previous Bible app I used had several limitations:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Could not highlight and copy Bible verses using mouse or keyboard shortcuts
+- Did not include the English book name in the Bible verse format
+- Did not follow my church's specific Bible verse insertion format
+- Made it difficult to navigate to specific verses quickly
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**The Solution:**
+Built this application with the following improvements:
 
-### `npm test`
+- **Easy Copy-Paste:** Highlight and copy verses using mouse or Ctrl+C/Cmd+C
+- **Proper Formatting:** Includes book name, chapter, and verse in the correct format
+- **Smart Chapter Selection:** Type chapter number or select from dropdown (helpful for books with many chapters)
+- **Quick Navigation:** Use browser's built-in search (Ctrl+F/Cmd+F) to find specific chapter and verse
+- **Bilingual Support:** Supports both English and Chinese, allowing non-Chinese speakers to help with Bible verse insertion in the future
+- **Search Functionality:** Search for verses in Chinese or English based on selected Bible version
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Features
 
-### `npm run build`
+- Bilingual interface (English and Chinese)
+- Three Bible versions: 和合本 (Chinese Union Version), NKJV, KJV
+- Type or select chapter number from dropdown
+- Easy copy-paste with proper formatting
+- Search across selected Bible versions:
+  - Search in Chinese when 和合本 is selected
+  - Search in English when NKJV or KJV is selected
+  - Multi-word search: finds verses containing all keywords
+  - Example: Search "love God" finds verses with both "love" and "God"
+- Browser search compatible (Ctrl+F/Cmd+F) for quick verse navigation
+- Web browser optimized (desktop use)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Technologies
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Frontend**
+- React 18.3.1
+- Bootstrap 5.3.3
+- React Hooks (useState, useEffect, useCallback)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Backend**
+- Node.js
+- Express.js
+- CSV Parser
 
-### `npm run eject`
+## Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+# Clone the repository
+git clone https://github.com/Christina-C11/bible-app.git
+cd bible-app
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Install frontend dependencies
+npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# Install backend dependencies
+cd backend
+npm install
+cd ..
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Start the application
+npm start
+```
 
-## Learn More
+Application will run at:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## How to Use
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. **Select Language** - Choose English or Chinese from the dropdown
+2. **Select Bible Version** - Check one or more versions (和合本, NKJV, KJV)
+3. **Select Book** - Click a book from Old Testament or New Testament
+4. **Select Chapter** - Type chapter number or select from dropdown
+5. **View Chapter** - All verses display with proper formatting
 
-### Code Splitting
+**Quick Navigation Tips:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Use browser search (Ctrl+F or Cmd+F) and type the chapter and verse number
+- Example: Search "3:16" to jump to verse 16 in chapter 3
+- For books with many chapters, type the chapter number directly instead of scrolling through the dropdown
 
-### Analyzing the Bundle Size
+**Search Functionality:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Type keywords in the search box
+2. Search automatically detects language:
+   - Chinese keywords search 和合本 (if selected)
+   - English keywords search NKJV/KJV (if selected)
+3. Multi-word search: Type "love God" to find all verses containing both words
+4. Results show all matching verses with book, chapter, and verse references
