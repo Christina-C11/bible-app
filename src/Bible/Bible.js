@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import BookSection from './Book/BookSection';
 import VersionSelector from './BibleVersion/VersionSelector';
+import SearchSelector from './Search/SearchSelector';
 import ChapterSelector from './Chapter/ChapterSelector';
 import VerseDisplay from './Verse/VerseDisplay';
 
@@ -22,15 +23,14 @@ function Bible() {
     NKJV: true,
     KJV: false,
   });
-
-  const [searchText, setSearchText] = useState('');
-    let verseObj = {
-    verses: verses,
-    selectedVersions: selectedVersions,
-    books: books,
-    selectedBookIndex: selectedBookIndex
-  };
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
+ const [searchText, setSearchText] = useState('');
+ let verseObj = {
+  verses: verses,
+  selectedVersions: selectedVersions,
+  books: books,
+  selectedBookIndex: selectedBookIndex
+ };
+ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
   // Preload data for the selected Bible version
   useEffect(() => {
@@ -90,6 +90,31 @@ function Bible() {
     }
   }, [selectedChapter, selectedBookIndex]);
 
+
+   useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchText.trim() && searchText !== "") {
+        const queryParams = new URLSearchParams({
+          q: searchText,
+          CN: selectedVersions.CN,
+          NKJV: selectedVersions.NKJV,
+          KJV: selectedVersions.KJV
+        });
+        fetch(`${API_BASE_URL}/api/search?${queryParams.toString()}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data){
+              setVerses(data.results);
+              setLoading(false);
+            }
+        })
+        .catch(err => console.error('Search error:', err));
+      } 
+    }, 300); // debounce delay
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
+
   const handleLanguageChange = useCallback((event) => {
     setSelectedLanguage(event.target.value);
     setSelectedBookIndex('');
@@ -106,10 +131,12 @@ function Bible() {
   }, []);
 
   const handleVersionChange = useCallback((event) => {
-    setSelectedVersions(prevState => ({
-      ...prevState,
-      [event.target.name]: event.target.checked,
-    }));
+    // setSelectedVersions(prevState => ({
+    //   ...prevState,
+    //   [event.target.name]: event.target.checked,
+    // }));
+    const { name, checked } = event.target;
+    setSelectedVersions(prev => ({ ...prev, [name]: checked }));
   }, []);
 
   // Extract verses from the preloaded data
@@ -137,7 +164,21 @@ function Bible() {
 
       {loading && <p>Loading...</p>}
       {error && <p className="text-danger">{error}</p>}
+      <div className="row">
+        <div className="col-md-12 col-lg-4">
+          <VersionSelector 
+            selectedVersions={selectedVersions}
+            handleVersionChange={handleVersionChange}
+          />
+        </div>
+         <div className="col-md-12 col-lg-8">         
+          <SearchSelector
+            searchText={searchText}
+            setSearchText={setSearchText}
+          />
 
+        </div>
+      </div>
       <div className="row">
         {/* Book Sections */}
         <div className="col-md-12 col-lg-4">
@@ -167,17 +208,18 @@ function Bible() {
 
         {/* Right Side: Version Selection, Chapter, and Verses */}
         <div className="col-md-12 col-lg-8">
-          <VersionSelector 
-            selectedVersions={selectedVersions}
-            handleVersionChange={handleVersionChange}
-          />
-
           <ChapterSelector 
             chapters={Object.keys(preloadedData[selectedBookIndex]?.chapters || [])}
             selectedChapter={selectedChapter}
             handleChapterSelection={handleChapterSelection}
           />
 
+          {searchText && !loading && (
+            <p className="mt-3 text-info text-start">
+              🔍 Found <strong>{verses.length}</strong> verse{verses.length !== 1 ? 's' : ''} matching "<em>{searchText}</em>".
+            </p>
+          )}
+          
           <VerseDisplay 
             verseObj={verseObj}
           />
