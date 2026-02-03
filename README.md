@@ -1,4 +1,4 @@
-# Multilingual Bible Search Application
+# Bilingual Bible Search Application
 
 A full-stack bilingual Bible application built with React and Node.js/Express for inserting Bible verses into church documents quickly and efficiently.
 
