@@ -1,10 +1,17 @@
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 const { version } = require('os');
 const app = express();
 const port = 5000;
+
+app.use(cors({
+  origin: '*', // Allow all origins for now
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Utility function to load CSV data
 const loadCSV = (filePath) => {
