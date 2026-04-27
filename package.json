@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
     "bootstrap-select": "^1.13.18",
+    "cors": "^2.8.6",
     "jquery": "^3.7.1",
     "quill": "^2.0.2",
     "react": "^18.3.1",
@@ -22,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "nodemon --inspect backend/Server.js",   
+    "server": "nodemon --inspect backend/Server.js",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "client": "react-scripts start"
   },
