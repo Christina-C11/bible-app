@@ -6,7 +6,7 @@ const path = require('path');
 const { version } = require('os');
 const app = express();
 const port = process.env.PORT || 5000;  // Use environment variable or default to 5000
-const cors = require('cors');  // Import cors
+
 // Enable CORS for all origins
 app.use(cors({
   origin: '*', // Allow all origins for now
