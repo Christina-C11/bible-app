@@ -144,9 +144,9 @@ app.get('/api/verses', async (req, res) => {
   }
 });
 
-// 🔍 Search API: /api/search?q=God
+// 🔍 Search API: /api/search?q=God  or  /api/search?q=Gen 1:1  or  /api/search?q=创 1:1
 app.get('/api/search', async (req, res) => {
-  const query = (req.query.q || '').trim().toLowerCase().split(/\s+/);
+  const queryRaw = (req.query.q || '').trim();
   const selectedVersions = ['CN', 'NKJV', 'KJV'].filter(v => req.query[v] === 'true');
   const versionFileMap = {
     CN: 'Bible_CN.csv',
@@ -155,15 +155,50 @@ app.get('/api/search', async (req, res) => {
   };
 
   try {
-    // Load all versions (for display)
     const versionData = {};
     for (const v of ['CN', 'NKJV', 'KJV']) {
       versionData[v] = await loadCSV(path.join(__dirname, 'data', versionFileMap[v]));
     }
 
+    // Detect verse reference pattern: e.g. "Gen 1:1", "创 1:1", "Gen 1", "创 1"
+    const refMatch = queryRaw.match(/^(.+)\s+(\d+)(?::(\d+))?$/);
+    if (refMatch) {
+      const abbrev = refMatch[1].trim();
+      const chapter = refMatch[2];
+      const verse = refMatch[3]; // undefined if no verse number given
+
+      const books = await loadCSV(path.join(__dirname, 'data', 'Books.csv'));
+      const book = books.find(b =>
+        b['English Abbreviation'].toLowerCase() === abbrev.toLowerCase() ||
+        b['Chinese Abbreviation'] === abbrev ||
+        b['English Full Name'].toLowerCase() === abbrev.toLowerCase() ||
+        b['Chinese Full Name'] === abbrev
+      );
+
+      if (book) {
+        const matched = versionData['CN'].filter(v =>
+          v.Book === book['Index'] &&
+          v.Chapter === chapter &&
+          (verse ? v.Verse === verse : true)
+        );
+
+        const results = matched.map(v => ({
+          BookIndex: parseInt(book['Index'], 10),
+          Chapter: parseInt(v.Chapter, 10),
+          Verse: parseInt(v.Verse, 10),
+          Scripture_CN: removeTags(v.Scripture),
+          Scripture_NKJV: removeTags(versionData['NKJV'].find(nv => nv.Book === book['Index'] && nv.Chapter === chapter && nv.Verse === v.Verse)?.Scripture),
+          Scripture_KJV: removeTags(versionData['KJV'].find(kv => kv.Book === book['Index'] && kv.Chapter === chapter && kv.Verse === v.Verse)?.Scripture),
+        }));
+
+        return res.json({ totalResult: results.length, results });
+      }
+    }
+
+    // Fall back to text search
+    const query = queryRaw.toLowerCase().split(/\s+/);
     const verseMap = new Map();
-   
-    // Search only selected versions
+
     for (const v of selectedVersions) {
       versionData[v].forEach(verse => {
         const text = removeTags(verse.Scripture || '').toLowerCase();
@@ -184,7 +219,6 @@ app.get('/api/search', async (req, res) => {
       });
     }
 
-    // Populate all version texts into matched verses
     for (const [key, record] of verseMap.entries()) {
       const [book, chapter, verse] = key.split('_');
       for (const v of ['CN', 'NKJV', 'KJV']) {
