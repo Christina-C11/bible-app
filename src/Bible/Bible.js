@@ -24,6 +24,7 @@ function Bible() {
     KJV: false,
   });
  const [searchText, setSearchText] = useState('');
+ const [highlightedVerse, setHighlightedVerse] = useState(null);
  let verseObj = {
   verses: verses,
   selectedVersions: selectedVersions,
@@ -113,6 +114,13 @@ function Bible() {
     return () => clearTimeout(delayDebounce);
   }, [searchText]);
 
+  const handleVerseClick = useCallback((bookIndex, chapter, verse) => {
+    setSearchText('');
+    setSelectedBookIndex(String(bookIndex));
+    setSelectedChapter(Number(chapter));
+    setHighlightedVerse({ bookIndex: Number(bookIndex) + 1, chapter: Number(chapter), verse: Number(verse) });
+  }, []);
+
   const handleLanguageChange = useCallback((event) => {
     setSelectedLanguage(event.target.value);
     setSelectedBookIndex('');
@@ -122,10 +130,12 @@ function Bible() {
   const handleBookSelection = useCallback((bookIndex) => {
     setSelectedBookIndex(bookIndex);
     setSelectedChapter('');
+    setHighlightedVerse(null);
   }, []);
 
   const handleChapterSelection = useCallback((event) => {
     setSelectedChapter(Number(event.target.value));
+    setHighlightedVerse(null);
   }, []);
 
   const handleVersionChange = useCallback((event) => {
@@ -218,8 +228,11 @@ function Bible() {
             </p>
           ))}
           
-          <VerseDisplay 
+          <VerseDisplay
             verseObj={verseObj}
+            isSearchMode={!!searchText}
+            onVerseClick={handleVerseClick}
+            highlightedVerse={highlightedVerse}
           />
         </div>
       </div>
